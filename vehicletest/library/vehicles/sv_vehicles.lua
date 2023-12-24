@@ -76,7 +76,6 @@ function ENTITY:EnableVehicle()
 	local colBC = self.Class:GetBodyColor()
 	local col = Color(colBC.x, colBC.y, colBC.z)
 	self:SetColor(Color(col.r, col.g, col.b, 255))
-	--self.Owner:Save()
 end
 
 function ENTITY:DisableVehicle(NoFire, noDamage)
@@ -96,7 +95,6 @@ function ENTITY:DisableVehicle(NoFire, noDamage)
 	self.AlarmEnabled = false
 	self:SetColor(Color(0, 0, 0, 255))
 	self.DoNitro = false
-	--self.Owner:Save()
 	if self:GetNW("cityrp_station", 0) != 0 then self:SetNW("cityrp_station", 0) end
 	local Driver = self:GetDriver()
 	if noDamage then return end
@@ -114,11 +112,6 @@ function VEHICLE:SetVehicleParameters()
 	options.engine.maxRPM = (options.engine.maxRPM * (self.Class and self.Class:GetMaxRPM() or 1)) * 1.5
 	options.engine.maxSpeed = (options.engine.maxSpeed * (self.Class and self.Class:GetMaxSpeed() or 1))
 	self:SetVehicleParams(options)
-end
-
-function ENTITY:SaveVehicle()
-	if !self.Class or !self:IsVehicle() or !self.Class.Save then return end
-	self.Class:Save()
 end
 
 function VEHICLE:StartTimedEvents()
@@ -218,7 +211,6 @@ function VEHICLE:StartTimedEvents()
 			end
 			self:SetNW("damage", self.CarDamage)
 			self.Class:SetDamage(self.CarDamage)
-			--self.Owner:Save()
 			local c = self.Class:GetBodyColor()
 			local col = Color(c.r,c.g,c.b)
 			local m = self.CarDamage / 100
@@ -282,7 +274,6 @@ function VEHICLE:StartTimedEvents()
 			if self.CarDamage >= 100 and !self.Disabled then self:DisableVehicle() end
 		end
 		self.RealDamage_LastVelocity = self:GetVelocity()
-		--self:SaveVehicle()
 	end
 	timer.Create("FuelDamage"..tostring(self:EntIndex()), iVehicleTimerTickRate, 0, function() VehicleTimer(self) end)
 end

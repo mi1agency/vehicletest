@@ -22,33 +22,6 @@ class "Vehicle" {
 		__declare				= function(self) ClassAutoGetSet(self) end,
 		Setup 					= function(self) self.All[self:AllKey()] = self end,
 		AllKey 					= function(self) return self:GetUniqueID() end,
-		Save 					= function(self)
-			imperial.Vehicle.SaveDB(self:GetUniqueID(), self:GetOwner(), self:GetVehicleID(), {
-				fine_reason = self:GetFineReason(),
-				fine_amount = self:GetFineAmount(),
-				fuel = self:GetFuel(),
-				damage = self:GetDamage(),
-				durability = self:GetDurability(),
-				for_sale = self:GetForSale(),
-				for_sale_price = self:GetForSalePrice(),
-				music_lights = self:GetMusicLights(),
-				armored = self:GetArmored(),
-				alarm = self:GetAlarm(),
-				nitro = self:GetNitro(),
-				hydraulics = self:GetHydraulics(),
-				launch_control = self:GetLaunchControl(),
-				underglow = self:GetUnderglow(),
-				underglow_color = util.TableToJSON({r = self:GetUnderglowColor().r, g = self:GetUnderglowColor().g, b = self:GetUnderglowColor().b}),
-				body_color = util.TableToJSON({r = self:GetBodyColor().r, g = self:GetBodyColor().g, b = self:GetBodyColor().b}),
-				skin = self:GetSkin(),
-				max_rpm = self:GetMaxRPM(),
-				max_speed = self:GetMaxSpeed(),
-				horsepower = self:GetHorsepower(),
-				bodygroups = util.TableToJSON(self:GetBodygroups()),
-			})
-		end,
-		Delete 					= function(self) imperial.Vehicle.DeleteDB(self:GetUniqueID()) end,
-		TransferOwnership 		= function(self, strNewOwnerID) imperial.Vehicle.ChangeOwnerDB(self:GetUniqueID(), self:GetOwner(), strNewOwnerID) end,
 
 		m_strUniqueID			= networked,
 		m_strVehicleID			= networked,
@@ -91,70 +64,5 @@ class "Vehicle" {
 	static {
 		All 					= {},
 		Database				= {},
-		DeleteDB 				= function(strUUID)
-			MySQLQuery(
-				"DELETE FROM `cityrp_vehicles` WHERE `uuid` = ?",
-				function(t, s, e)
-					if s then
-						Log("VEHICLE-DELETE", ("Permanently deleting vehicle: %s"):format(strUUID))
-					else
-						-- did not delete for some reason
-					end
-				end,
-				{strUUID}
-			)
-		end,
-		ChangeOwnerDB			= function(strUUID, strOwner, strNewOwner)
-			-- TODO
-		end,
-		SaveDB 					= function(strUUID, strOwner, strVehicleID, tblData, bCount)
-			bCount = bCount or 0
-			MySQLQuery(
-				"SELECT * FROM `cityrp_vehicles` WHERE `uuid` = ?", 
-				function(t, s, e)
-					if s and t[1] and t[1]["owner"] == strOwner and t[1]["vehicle_id"] == strVehicleID then
-						local strData = "SET "
-						local tblValues = {}
-						for k, v in pairs(tblData) do
-							strData = strData .. "`"..k.."` = ?,"
-							table.insert(tblValues, v)
-						end
-						strData = strData:sub(1, -2)
-						table.insert(tblValues, strUUID)
-						table.insert(tblValues, strOwner)
-						MySQLQuery(
-							"UPDATE `cityrp_vehicles` "..strData.." WHERE `uuid` = ? AND `owner` = ?",
-							function(t,s,e) --[[Notify player?]] end,
-							tblValues
-						)
-					else
-						local strData = ""
-						local strValues = ""
-						local tblValues = {strUUID, strOwner, strVehicleID}
-						for k, v in pairs(tblData) do
-							strData = strData .. "`"..k.."`,"
-							strValues = strValues .. "?,"
-							table.insert(tblValues, v)
-						end
-						strData = strData:sub(1, -2)
-						strValues = strValues:sub(1, -2)
-						MySQLQuery(
-							"INSERT INTO `cityrp_vehicles` (`uuid`,`owner`,`vehicle_id`,"..strData..") VALUES(?,?,?,"..strValues..")",
-							function(a, b, c)
-								if bCount > 1 then return end
-								if b then
-									--[[Notify player?]]
-								else
-									bCount = bCount + 1
-									imperial.Vehicle.SaveDB(GenerateUUID2023(), strOwner, strVehicleID, tblData, bCount)
-								end
-							end,
-							tblValues
-						)
-					end
-				end,
-				{strUUID}
-			)
-		end,
 	},
 }

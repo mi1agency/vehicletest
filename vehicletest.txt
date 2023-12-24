@@ -1,0 +1,7 @@
+"vehicletest"
+{
+	"base"		"sandbox"
+	"title"		"Imperial Servers Vehicle Tester"
+	"maps"		""
+	"menusystem"	"1"
+}

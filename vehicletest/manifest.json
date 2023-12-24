@@ -1,0 +1,7 @@
+{
+	"LIBRARY":["imperial_community_2019", "imperial_community_2019/*", "imperialservers", "imperialservers/*", "vehicles", "GAMEMODE"],
+	"CLASS":["GAMEMODE"],
+	"ENTITY":["GAMEMODE"],
+	"ITEM":["GAMEMODE"],
+	"PLUGIN":[]
+}
